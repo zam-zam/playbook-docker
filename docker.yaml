@@ -1,0 +1,19 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+
+  tasks:
+    - name: Build docker image
+      docker_image:
+        path: ./docker/eg_sshd/
+        name: eg_sshd
+
+    - name: Start container
+      docker_container:
+        name: eg_sshd
+        image: eg_sshd
+        state: started
+        recreate: yes
+        ports:
+          - "127.0.0.1:47222:22"
+          - "8888:80"

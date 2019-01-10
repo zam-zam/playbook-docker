@@ -1,0 +1,36 @@
+---
+- hosts: eg_sshd
+  remote_user: root
+
+  tasks:
+    - name: Install packages
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      with_items:
+        - nginx
+        - php-fpm
+    - name: Copy nginx.conf
+      copy:
+        src: ./files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        mode: 0644
+    - name: Copy php-fpm pool conf
+      copy:
+        src: ./files/www-pool.conf
+        dest: /etc/php/7.0/fpm/pool.d/www.conf
+        mode: 0644
+    - name: Create /app dir
+      file:
+        path: /app
+        state: directory
+    - name: Copy index.php to /app dir
+      copy:
+        src: ./files/index.php
+        dest: /app/index.php
+
+    - name: restart nginx and php-fpm
+      command: /etc/init.d/{{ item }} start
+      with_items:
+        - nginx
+        - php7.0-fpm
